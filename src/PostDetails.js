@@ -1,13 +1,15 @@
 import React, { Component } from 'react'
 import { Table } from 'react-bootstrap';
+import { millisecondsToHuman } from './helpers'
 
 class PostDetails extends Component {
   state = {
-     posts:[] 
+     posts:[],
+     comments:[]
   }
-  
+
   componentDidMount(){ 
-    fetch('http://localhost:3001/posts',{
+    fetch('http://localhost:5001/posts',{
        headers: {
          'Authorization': 'Eun', 
          'Content-Type': 'application/x-www-form-urlencoded'
@@ -26,39 +28,27 @@ class PostDetails extends Component {
       });
   }
 
+
   render(){
-    console.log('posts',this.state.posts)
-    const {posts} =this.state
 
   	return(
-      <div className='center'>
-       <Table striped bordered condensed hover>
-          <thead>
-            <tr>
-              <th width="50px">Vote</th>
-              <th><center>Posts</center></th>
-              
-            </tr>
-          </thead>
-          <tbody>
-             {posts.map((post)=>(
-                <tr key={post.id}>
-                  <td >{post.voteScore}</td>
-                  <td >{post.title}
-                       <p>{post.body}</p>
-                       <p>By: {post.author}</p>
-                       <p>{post.timestamp}</p>
-                  </td>
-                </tr>
-
-              ))}
-                                              
-          </tbody>
-       </Table>
-      </div>
+     
   	)
   }  
 
 }
 
+
+
+/*
+
+class totalPostComment extends React.Component {
+  
+  render(){
+    return(
+       2
+    )
+  }
+}  
+*/
 export default PostDetails

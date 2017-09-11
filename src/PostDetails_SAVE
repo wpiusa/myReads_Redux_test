@@ -1,0 +1,104 @@
+import React, { Component } from 'react'
+import { Table } from 'react-bootstrap';
+import { millisecondsToHuman } from './helpers'
+
+class PostDetails extends Component {
+  state = {
+     posts:[],
+     comments:[]
+  }
+
+  componentDidMount(){ 
+    fetch('http://localhost:5001/posts',{
+       headers: {
+         'Authorization': 'Eun', 
+         'Content-Type': 'application/x-www-form-urlencoded'
+       }, 
+    })
+      .then((response) => response.json())
+
+      .then((responseJson) => {
+        
+        this.setState({
+          posts:responseJson
+        })
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }
+
+/*
+
+  countTotalComments = (postId) => {
+   
+   fetch('http://localhost:5001/posts/'+postId+'/comments',{
+                          
+       headers: {
+         'Authorization': 'Eun', 
+         'Content-Type': 'application/x-www-form-urlencoded'
+       }, 
+    })
+      .then((response) => response.json())
+       
+      .then((responseJson) => {
+        //console.log("comments",responseJson.length)
+        this.setState({
+          comments:responseJson
+        })
+       })
+      .catch((error) => {
+        console.error(error);
+      });
+  
+  } 
+*/    
+  render(){
+    console.log('posts',this.state.posts)
+    const {posts} =this.state
+
+    //console.log(this.state.totalComments)
+  	return(
+      <div className='center'>
+       <Table striped bordered condensed hover>
+          <thead>
+            <tr>
+              <th width="50px">Vote</th>
+              <th><center>Posts</center></th>
+              
+            </tr>
+          </thead>
+          <tbody>
+             {posts.map((post)=>(
+
+                <tr key={post.id}>
+                  
+                  <td >{post.voteScore}</td>
+                  <td >{post.title}
+                       <p>{post.body}</p>
+                       <totalPostComment postId={post.id}/> 
+                       <p>By: {post.author}{' '}{millisecondsToHuman(post.timestamp)} {' '}  </p>
+                      
+                  </td>
+                </tr>
+
+              ))}
+                                              
+          </tbody>
+       </Table>
+      </div>
+  	)
+  }  
+
+}
+
+class totalPostComment extends React.Component {
+  
+  render(){
+    return(
+       2
+    )
+  }
+}  
+
+export default PostDetails
