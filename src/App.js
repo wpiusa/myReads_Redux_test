@@ -23,7 +23,7 @@ class App extends Component {
   }
 
   componentDidMount(){ 
-    fetch('http://localhost:5001/posts',{
+    fetch('http://localhost:3001/posts',{
        headers: {
          'Authorization': 'Eun', 
          'Content-Type': 'application/x-www-form-urlencoded'
@@ -42,12 +42,48 @@ class App extends Component {
       });
   }
 
+  /**
+
+  handlePostVote = (postId) => {
+    const nextPosts = this.state.posts.map((post) => {
+      if (post.id === postId) {
+        return Object.assign({}, post, {
+          voteScore: post.voteScore + 1,
+        });
+      } else {
+        return nextPosts;
+      }
+    });
+    this.setState({
+      posts: nextPosts,
+    });
+  }
+*/
+  handlePostVote = (postId) => {
+     
+
+     const tmpPost=this.state.posts.map((post) => {
+      
+      return Object.assign({}, post, {
+                voteScore: post.voteScore + 1,
+              });
+     
+     });
+     this.setState({
+          posts:tmpPost
+     })
+  }   
+
+
   render(){
   	//console.log("posts",this.state.posts.length)
   	return(
       <div className="center">
         <PostNav />
-        <PostDetails posts={this.state.posts}/>
+        <PostDetails 
+          posts={this.state.posts}
+          onVote={this.handlePostVote}
+        />
       </div>
   	)
   }  
@@ -76,8 +112,13 @@ class PostNav extends Component {
 
 class PostDetails extends Component {
   render(){
-  	console.log("posts props",this.props.posts)
-  	const posts = this.props.posts.map((post) =>(
+    //console.log("vote",this.props.onVote)
+  	//console.log("posts props",this.props.posts)
+    const posts = this.props.posts.sort((a, b) => (
+      b.voteScore - a.voteScore
+    ));
+
+  	const postsComp=posts.map((post) =>(
       <DisplayPost 
          key={post.id}
          id={post.id}
@@ -85,11 +126,13 @@ class PostDetails extends Component {
          body={post.body}
          author={post.author}
          timestamp={post.timestamp}
+         voteScore={post.voteScore}
+         onVote={this.props.onVote}
       />
   	));
   	return(
       <div>
-        {posts}
+        {postsComp}
       </div>
   	)
   }	
@@ -97,26 +140,40 @@ class PostDetails extends Component {
 
 class DisplayPost extends Component {
   
+ handleUpVote =() =>{
+  
+  this.props.onVote(this.props.id)
+ }
 
   render(){
-  	return(
-      <div className='boxrow'>
-        <div>
-          {this.props.title } 
-        </div>
-        
-        <div>
-          {this.props.body}
-        </div>
-        
-        <div>
-           <p>By: {this.props.author}{' '}{millisecondsToHuman(this.props.timestamp)} {' '}  </p>
-        </div>
 
-        <div>
-           <TotalComments postId={this.props.id}/>
-        </div>
-      </div>
+  	return(
+    <div className='boxrow'>
+      <table>
+       <tbody> 
+        <tr>
+          <td width="5%"><img src={'up.JPG'} onClick={this.handleUpVote}/></td>
+          <td>{this.props.title }</td>
+        </tr>
+
+        <tr>
+          <td>{this.props.voteScore}</td>
+          <td>{this.props.body }</td>
+        </tr>
+
+        <tr>
+          <td></td>
+          <td>By: {this.props.author}{' '}{millisecondsToHuman(this.props.timestamp)} {' '}</td>
+        </tr>
+
+        <tr>
+          <td><img src={'down.JPG'}/></td>
+          <td><TotalComments postId={this.props.id}/></td>
+        </tr>
+       </tbody>
+      </table>
+     </div> 
+      
   	)
   }	
 }
@@ -127,9 +184,10 @@ class TotalComments extends Component {
    	totalComment:0
    }
 
-    
-    countTotalComments = (postId) => {
-       fetch('http://localhost:5001/posts/'+postId+'/comments',{
+   componentWillMount(){
+  
+
+     fetch('http://localhost:3001/posts/'+this.props.postId+'/comments',{
                           
        headers: {
          'Authorization': 'Eun', 
@@ -146,12 +204,14 @@ class TotalComments extends Component {
       .catch((error) => {
         console.error(error);
       });
-    }
+   }
+        
+
   render(){
 
   	return(
       <div>
-         {this.countTotalComments(this.props.postId)} Comments:{' '}{this.state.totalComment}
+         <p>Comments:{ ' '}{this.state.totalComment}</p>
       </div>
      
   	)
